@@ -7,18 +7,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                // Use SSH key credential for private repo
-                checkout([$class: 'GitSCM',
-                  branches: [[name: '*/main']],
-                  userRemoteConfigs: [[
-                      url: 'git@github.com:mohameedomaarr/jenkins-k8s-flask-app.git',
-                      credentialsId: 'github-ssh-key'
-                  ]]
-                ])
-            }
-        }
 
         stage('Setup') {
             steps {
