@@ -50,12 +50,16 @@ pipeline {
 
         stage('Deploy to Prod') {
             steps {
-                sh """
-                    export KUBECONFIG=${KUBECONFIG}
-                    kubectl config use-context user@prod.us-east-1.eksctl.io
-                    kubectl config current-context
-                    kubectl set image deployment/flask-app flask-app=${IMAGE_TAG}
-                """
+                withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+                    sh """
+                        # Use the correct context name from your kubeconfig
+                        CONTEXT_NAME=\$(kubectl --kubeconfig=$KUBECONFIG config get-contexts -o name | head -n 1)
+
+                        kubectl --kubeconfig=$KUBECONFIG config use-context \$CONTEXT_NAME
+                        kubectl config current-context
+                        kubectl set image deployment/flask-app flask-app=${IMAGE_TAG} --context \$CONTEXT_NAME
+                    """
+                }
             }
         }
     }
