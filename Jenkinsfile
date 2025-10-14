@@ -11,11 +11,11 @@ pipeline {
     stages {
         stage('Setup') {
             steps {
-                // Set up Python virtual environment
+                // Set up Python virtual environment using Bash
                 sh """
-		    #!/bin/bash	
+                    #!/bin/bash
                     python3 -m venv ${VENV_PATH}
-                    source ${VENV_PATH}/bin/activate
+                    . ${VENV_PATH}/bin/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
                 """
