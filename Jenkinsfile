@@ -4,13 +4,26 @@ pipeline {
     environment {
         IMAGE_NAME = 'mohameedomaarr/jenkins-k8s-flask-app'
         IMAGE_TAG = "${IMAGE_NAME}:${env.GIT_COMMIT}"
+        KUBECONFIG = credentials('kubeconfig-credentials-id')
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
     }
 
     stages {
-
         stage('Setup') {
             steps {
-                sh "pip install -r requirements.txt"
+                // Show KUBECONFIG permissions and set them
+                sh 'ls -la $KUBECONFIG'
+                sh 'chmod 644 $KUBECONFIG'
+                sh 'ls -la $KUBECONFIG'
+
+                // Create Python virtual environment and install dependencies
+                sh '''
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
             }
         }
 
@@ -40,9 +53,8 @@ pipeline {
 
         stage('Deploy to Prod') {
             steps {
-                // Use IAM Role to authenticate AWS CLI automatically
-                sh 'aws eks --region us-east-1 update-kubeconfig --name prod'
-                sh 'kubectl config use-context arn:aws:eks:us-east-1:527111402169:cluster/prod'
+                sh 'kubectl config use-context user@prod.us-east-1.eksctl.io'
+                sh 'kubectl config current-context'
                 sh "kubectl set image deployment/flask-app flask-app=${IMAGE_TAG}"
             }
         }
