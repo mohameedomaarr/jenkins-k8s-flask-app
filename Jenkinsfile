@@ -50,9 +50,12 @@ pipeline {
 
         stage('Deploy to Prod') {
             steps {
-                sh 'kubectl config use-context user@prod.us-east-1.eksctl.io'
-                sh 'kubectl config current-context'
-                sh "kubectl set image deployment/flask-app flask-app=${IMAGE_TAG}"
+                sh """
+                    export KUBECONFIG=${KUBECONFIG}
+                    kubectl config use-context user@prod.us-east-1.eksctl.io
+                    kubectl config current-context
+                    kubectl set image deployment/flask-app flask-app=${IMAGE_TAG}
+                """
             }
         }
     }
