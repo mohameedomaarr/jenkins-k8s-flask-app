@@ -13,6 +13,7 @@ pipeline {
             steps {
                 // Set up Python virtual environment
                 sh """
+		    #!/bin/bash	
                     python3 -m venv ${VENV_PATH}
                     source ${VENV_PATH}/bin/activate
                     pip install --upgrade pip
