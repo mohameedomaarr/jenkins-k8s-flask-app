@@ -5,25 +5,21 @@ pipeline {
         IMAGE_NAME = 'mohameedomaarr/jenkins-k8s-flask-app'
         IMAGE_TAG = "${IMAGE_NAME}:${env.GIT_COMMIT}"
         KUBECONFIG = credentials('kubeconfig-credentials-id')
-        AWS_ACCESS_KEY_ID = credentials('aws-access-key')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
+        VENV_PATH = "${WORKSPACE}/venv"
     }
 
     stages {
         stage('Setup') {
             steps {
-                // Show KUBECONFIG permissions and set them
+                // Set up Python virtual environment
+                sh """
+                    python3 -m venv ${VENV_PATH}
+                    source ${VENV_PATH}/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                """
                 sh 'ls -la $KUBECONFIG'
                 sh 'chmod 644 $KUBECONFIG'
-                sh 'ls -la $KUBECONFIG'
-
-                // Create Python virtual environment and install dependencies
-                sh '''
-                python3 -m venv venv
-                source venv/bin/activate
-                pip install --upgrade pip
-                pip install -r requirements.txt
-                '''
             }
         }
 
