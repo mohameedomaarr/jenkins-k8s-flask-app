@@ -57,7 +57,10 @@ pipeline {
 
                         kubectl --kubeconfig=$KUBECONFIG config use-context \$CONTEXT_NAME
                         kubectl config current-context
+			kubectl apply -f k8s/deployment.yaml --context \$CONTEXT_NAME
+			kubectl apply -f k8s/service.yaml --context \$CONTEXT_NAME
                         kubectl set image deployment/flask-app flask-app=${IMAGE_TAG} --context \$CONTEXT_NAME
+			kubectl rollout status deployment/flask-app --context \$CONTEXT_NAME
                     """
                 }
             }
