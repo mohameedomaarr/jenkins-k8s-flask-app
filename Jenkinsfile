@@ -16,8 +16,8 @@ pipeline {
                     #!/bin/bash
                     python3 -m venv ${VENV_PATH}
                     . ${VENV_PATH}/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
+                    pip install --upgrade pip --break-system-packages
+                    pip install --break-system-packages -r requirements.txt 
                 """
                 sh 'ls -la $KUBECONFIG'
                 sh 'chmod 644 $KUBECONFIG'
